@@ -6,18 +6,23 @@ on:
   workflow_dispatch:
     # Inputs the workflow accepts.
     inputs:
-      run-job-3:
-        description: "Run job 3"
+      fail-job-2:
+        description: "Fail Job 2"
         required: true
         type: boolean
-
+        default: false
+      skip-job-3:
+        description: "Skip Job 3"
+        required: true
+        type: boolean
+        default: false
 jobs:
   job-1:
     name: Job 1
     runs-on: ubuntu-latest
     steps:
-      - name: Output for Job 1
-        run: echo "Hello from Job 1. Run Job 3 equals ${{ github.event.inputs.run-job-3 }}"
+      - name: Output workflow parameters
+        run: echo "Hello from Job 1. Skip Job 3 equals ${{ github.event.inputs.skip-job-3 }}. Fail Job 2 equals ${{ github.event.inputs.fail-job-2 }}"
 
   job-2:
     name: Job 2
@@ -25,12 +30,15 @@ jobs:
     needs:
       - job-1
     steps:
-      - name: Output for Job 2
-        run: exit 0
+      - name: Fail if requested
+        run: |
+          if [ "${{ github.event.inputs.fail-job-2 }}" == "true" ]; then
+            exit 1
+          fi
     
   job-3:
     name: Job 3
-    if: github.event.inputs.run-job-3 == 'true'
+    if: github.event.inputs.skip-job-3 == 'false'
     runs-on: ubuntu-latest
     needs:
       - job-1
@@ -39,12 +47,36 @@ jobs:
         run: echo "Hello from Job 3"
 
   job-4:
-    name: Job 4
+    name: Job 4 default
+    # The default behavior is that this job is skipped if any of the needs fails or skips.
     runs-on: ubuntu-latest
-    if: always() 
     needs:
       - job-2
       - job-3
     steps:
       - name: Output for Job 4
         run: echo "Hello from Job 4"
+        
+  job-5:
+    # With always(), this job is always run, no matter if any of the needs fails or skips.
+    name: Job 5 if always
+    runs-on: ubuntu-latest
+    if: always() 
+    needs:
+      - job-2
+      - job-3
+    steps:
+      - name: Output for Job 5
+        run: echo "Hello from Job 5"
+
+  job-6:
+    # With failure(), this job runs only if at least one of the two fails.
+    name: Job 6 if failure
+    runs-on: ubuntu-latest
+    if: failure() # returns true if ANY of the needs jobs failed (in all other cases it skips). Useful for logging, rollback, alerting, notifications.
+    needs:
+      - job-2
+      - job-3
+    steps:
+      - name: Output for Job 6
+        run: echo "Hello from Job 6"
