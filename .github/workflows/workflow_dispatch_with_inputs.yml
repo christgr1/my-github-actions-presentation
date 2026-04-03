@@ -23,6 +23,13 @@ on:
         type: string
         default: "no name"
         required: true
+      number_input:
+        description: "A number. Magic number for test to pass is 5"
+        type: number
+        default: 0
+        required: true
+      environment_var:
+        type: environment
 
 run-name: "${{ inputs.workflow_tag }} with options: boolean_required: ${{ inputs.boolean_required_default_false }}, boolean_optional: ${{ inputs.boolean_optional_default_true }}, project: ${{ inputs.project }}, by ${{ github.actor }}"
 jobs:
@@ -31,3 +38,12 @@ jobs:
     steps:
       - name: Log Inputs
         run: echo "${{ toJson(github.event.inputs) }}"
+      - name: Check magic number
+        if: inputs.number_input != 5
+        run: exit 1
+      - name: Check magic number version 2
+        run: |
+         if [[ "${{ inputs.number_input }}" != "5" ]]; then
+          echo "::error::Expected 5, got ${{ inputs.number_input }}"
+          exit 1
+         fi
