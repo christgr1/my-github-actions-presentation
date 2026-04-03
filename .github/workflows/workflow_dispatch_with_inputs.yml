@@ -22,6 +22,7 @@ on:
         description: Tag to use on workflow title
         type: string
         default: "no name"
+        required: true
 
 run-name: "${{ inputs.workflow_tag }} with options: boolean_required: ${{ inputs.boolean_required_default_false }}, boolean_optional: ${{ inputs.boolean_optional_default_true }}, project: ${{ inputs.project }}, by ${{ github.actor }}"
 jobs:
