@@ -1,0 +1,32 @@
+name: Variables and Context 2
+on: 
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: choice
+        options:
+          - production
+          - staging
+          - development
+        default: 'production'
+      operating_systems:
+        type: choice
+        description: 'Operating systems to run the workflow on'
+        required: true
+        options:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+        default: 'ubuntu-latest'
+
+jobs:
+  job1:
+    runs-on:
+      - ubuntu-latest
+      - windows-latest
+      - macos-latest
+    steps:
+      - name: Set a new environment variable
+        run: 
