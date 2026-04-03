@@ -1,0 +1,32 @@
+name: Workflow Inputs
+on: 
+  workflow_dispatch:
+    inputs:
+      boolean_required_default_false:
+        description: "Choose a value for this required boolean, default: false"
+        type: boolean
+        default: false
+        required: true
+      boolean_optional_default_true:
+        description: "Choose a value for this optional boolean, default: true"
+        type: boolean
+        default: true
+        required: false
+      project:
+        description: "Select which project you want to run the workflow for"
+        type: choice
+        options:
+          - project1
+          - project2
+      workflow_tag:
+        description: Tag to use on workflow title
+        type: string
+        default: "no name"
+
+run-name: "${{ inputs.workflow_tag }} with options: boolean_required: ${{ inputs.boolean_required_default_false }}, boolean_optional: ${{ inputs.boolean_optional_default_true }}, project: ${{ inputs.project }}, by ${{ github.actor }}"
+jobs:
+  log_inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log Inputs
+        run: echo "${{ toJson(github.event.inputs) }}"
